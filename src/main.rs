@@ -1,5 +1,12 @@
-use std::io;
 use std::fs;
+
+use std::io;
+use std::io::{BufRead, BufReader, Read};
+
+use encoding_rs::WINDOWS_1251;
+use encoding_rs_io;
+use encoding_rs_io::DecodeReaderBytesBuilder;
+
 
 fn main() {
     println!("Введите имя файла: ");
@@ -9,10 +16,17 @@ fn main() {
         .read_line(&mut input)
         .expect("Ошибка в чтении строки ввода");
 
-    let content = fs::read_to_string(input.trim())
-        .expect("Должен был открыться файл");
+    let file = fs::File::open(input.trim()).unwrap();
+    let mut reader = BufReader::new(
+        DecodeReaderBytesBuilder::new()
+            .encoding(Some(WINDOWS_1251))
+            .build(file));
 
-    println!("{content}");
+    let mut reader_str = String::new();
 
+    reader.read_to_string(&mut reader_str).expect("cannot read string");
 
+    println!("{}", reader_str);
+
+    let result_file = fs::File::create("result.txt");
 }
