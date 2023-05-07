@@ -24,9 +24,24 @@ fn main() {
 
     let mut reader_str = String::new();
 
-    reader.read_to_string(&mut reader_str).expect("cannot read string");
+    for line in reader.lines() {
+        let result = match line {
+            Ok(line) => line,
+            Err(error) => "Ошибка".to_string(),
+        };
+        if result.contains("Фамилия: ") {
+            println!("{}", result);
+        }
 
-    println!("{}", reader_str);
+    }
+
+    //reader.read_to_string(&mut reader_str).expect("cannot read string");
+
+    //for line in reader_str.split("/n") {
+    //    if line.contains("2222") {
+    //        println!("{line}");
+    //    }
+    //}
 
     let result_file = fs::File::create("result.txt");
 }
