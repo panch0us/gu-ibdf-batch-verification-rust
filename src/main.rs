@@ -1,27 +1,18 @@
-use std::fs::File;
-use std::io::BufReader;
-use std::io::BufRead;
+use std::io;
+use std::fs;
 
 fn main() {
-    let text = String::from("Фамилия: Иванов Имя: Иван Отчество: Иванович");
-    let text_split: Vec<&str> = text.split(" ").collect();
+    println!("Введите имя файла: ");
+    let mut input = String::new();
 
-    println!("{}", text);
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Ошибка в чтении строки ввода");
 
-    println!("{:?}", text_split);
+    let content = fs::read_to_string(input.trim())
+        .expect("Должен был открыться файл");
 
-    for word in text_split {
-        println!("{}", word);
-    }
+    println!("{content}");
 
-    let file = File::open("file.txt").unwrap();
-    let reader = BufReader::new(file);
 
-    for (index, line) in reader.lines().enumerate() {
-        let line = line.unwrap(); // Ignore errors.
-        // Show the line and its number.
-        println!("{}. {}", index + 1, line);
-    }
 }
-
-//иванов;иван;иванович;2222;;
