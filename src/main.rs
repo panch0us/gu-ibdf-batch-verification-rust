@@ -1,8 +1,7 @@
 use std::fs;
-use std::fs::File;
 
 use std::io;
-use std::io::{BufRead, BufReader, Read, Error, Write};
+use std::io::{BufRead, BufReader, Error, Write};
 
 use encoding_rs::WINDOWS_1251;
 use encoding_rs_io;
@@ -18,12 +17,10 @@ fn main() {
         .expect("Ошибка в чтении строки ввода.");
 
     let sourse_file = fs::File::open(input.trim()).unwrap();
-    let mut reader = BufReader::new(
+    let reader = BufReader::new(
         DecodeReaderBytesBuilder::new()
             .encoding(Some(WINDOWS_1251))
             .build(sourse_file));
-
-    let mut reader_str = String::new();
 
     //Строка для заполнения после обработки (Ф;И;О;YYYY;;)
     let mut result_str = String::new();
@@ -31,7 +28,7 @@ fn main() {
     for line in reader.lines() {
         let result = match line {
             Ok(ok) => ok,
-            Err(error) => "Ошибка".to_string(),
+            Err(error) => format!("Ошибка {error}"),
         };
 
         if result.contains("Фамилия: ") {
@@ -61,6 +58,6 @@ fn main() {
 
 fn write_in_result_file(s: String) -> Result<(), Error>{
     let mut result_file = fs::File::create("result.txt")?;
-    write!(result_file, "{}", s);
+    write!(result_file, "{}", s)?;
     Ok(())
 }
