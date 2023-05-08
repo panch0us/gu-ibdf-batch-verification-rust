@@ -3,7 +3,13 @@ name = "gu-ibdf-batch-verification-rust"
 version = "0.1.0"
 edition = "2021"
 
+build = "build.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+winres = "0.1"
+
 
 [dependencies]
 encoding_rs = "0.8.32"
