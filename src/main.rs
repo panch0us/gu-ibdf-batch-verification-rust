@@ -57,7 +57,13 @@ fn main() {
 }
 
 fn write_in_result_file(s: String) -> Result<(), Error>{
-    let mut result_file = fs::File::create("result.txt")?;
-    write!(result_file, "{}", s)?;
-    Ok(())
+    let mut result_file = match fs::File::create("result.txt") {
+        Ok(file) => file,
+        Err(error) => return Err(error),
+    };
+
+    match write!(result_file, "{}", s) {
+        Ok(_) => Ok(()),
+        Err(error) => Err(error),
+    }
 }
