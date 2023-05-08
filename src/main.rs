@@ -1,7 +1,8 @@
 use std::fs;
+use std::fs::File;
 
 use std::io;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader, Read, Error, Write};
 
 use encoding_rs::WINDOWS_1251;
 use encoding_rs_io;
@@ -14,34 +15,52 @@ fn main() {
 
     io::stdin()
         .read_line(&mut input)
-        .expect("Ошибка в чтении строки ввода");
+        .expect("Ошибка в чтении строки ввода.");
 
-    let file = fs::File::open(input.trim()).unwrap();
+    let sourse_file = fs::File::open(input.trim()).unwrap();
     let mut reader = BufReader::new(
         DecodeReaderBytesBuilder::new()
             .encoding(Some(WINDOWS_1251))
-            .build(file));
+            .build(sourse_file));
 
     let mut reader_str = String::new();
 
+    //Строка для заполнения после обработки (Ф;И;О;YYYY;;)
+    let mut result_str = String::new();
+
     for line in reader.lines() {
         let result = match line {
-            Ok(line) => line,
+            Ok(ok) => ok,
             Err(error) => "Ошибка".to_string(),
         };
+
         if result.contains("Фамилия: ") {
-            println!("{}", result);
+            result_str.push_str(&result[16..].trim());
+            result_str.push(';');
         }
 
+        if result.contains("Имя: ") {
+            result_str.push_str(&result[8..].trim());
+            result_str.push(';');
+        }
+
+        if result.contains("Отчество: ") {
+            result_str.push_str(&result[18..].trim());
+            result_str.push(';');
+        }
+
+        if result.contains("Дата рождения: ") {
+            result_str.push_str(&result[33..].trim());
+            result_str.push_str(";;");
+            result_str.push('\n');
+        }
     }
 
-    //reader.read_to_string(&mut reader_str).expect("cannot read string");
+    write_in_result_file(result_str);
+}
 
-    //for line in reader_str.split("/n") {
-    //    if line.contains("2222") {
-    //        println!("{line}");
-    //    }
-    //}
-
-    let result_file = fs::File::create("result.txt");
+fn write_in_result_file(s: String) -> Result<(), Error>{
+    let mut result_file = fs::File::create("result.txt")?;
+    write!(result_file, "{}", s);
+    Ok(())
 }
